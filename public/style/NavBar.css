@@ -1,0 +1,86 @@
+
+a:link { 
+    text-decoration: none;
+    color:black;
+  } 
+  a:visited { 
+    text-decoration: none;
+    color:black;
+  } 
+  a:hover { 
+    text-decoration: none; 
+    color:black;
+  } 
+  a:active { 
+    text-decoration: none; 
+    color:black;
+  }
+  
+.navBar {
+    display:flex;
+    align-items: center;
+    justify-content:space-between;
+    
+    background-color: rgb(252, 228, 175);
+    
+    box-shadow: 0 30px 40px rgba(0,0,0,.1);
+    
+    
+}
+
+
+  #logo:hover {
+    filter: drop-shadow(0 0 2em #646cffaa);
+  }
+  #logo.react:hover {
+    filter: drop-shadow(0 0 2em #61dafbaa);
+  }
+  
+  @keyframes logo-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  @media (prefers-reduced-motion: no-preference) {
+    a:nth-of-type(2) .logo {
+      animation: logo-spin infinite 20s linear;
+    }
+  }
+#shopLink {
+    font-size:2vh;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    border-radius:6px;
+    padding:15px;
+    background-color:rgba(193, 250, 255, 0.638);
+}
+#logo {
+    width:20vw;
+    max-width:300px;
+    height:8vw;
+    max-height:100px;
+    
+}
+.cart {
+    display:flex;
+    align-items:center;
+}
+
+#cartImg {
+  width:2vw;
+  height:2vw; 
+}
+
+.cartCount {
+    background-color: rgb(245, 199, 15);
+    border-radius: 15px;
+    width:25px;
+    height:20px;
+    text-align:center;
+    padding-top:4px;
+
+    
+}
