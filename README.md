@@ -8,4 +8,4 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 # birdShop
 Just a simple site for all your bird buying needs. React-router used to make a single page site with multiple components.<br>
-See it in action [here](https://memory-game-bird-edition.netlify.app/).
+See it in action [here](https://avianavenue.netlify.app/).
