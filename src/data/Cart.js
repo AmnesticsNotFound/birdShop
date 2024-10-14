@@ -1,5 +1,5 @@
 let Cart = [
-    0,   
+    40,   
 ]
 
 export default Cart;

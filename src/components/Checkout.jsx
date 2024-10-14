@@ -1,5 +1,6 @@
 import { useState, useEffect} from 'react';
 import { useRef } from 'react';
+import {useCookies} from 'react-cookie';
 import React from "react";
 import { useParams } from "react-router-dom";
 import Catalog from '../data/Catalog.js';
@@ -8,232 +9,182 @@ import '/public/style/Checkout.css';
 
 //THE USEEFFECTS COULD HAVE BEEN AVOIDED BY USING USING INLINE JS IN JSX
 function Checkout() {
-    const isInitialMount = useRef(true);
-    const [cartS, setCart] = useState(Cart);
+    
+    const [cookies, setCookie, removeCookie] = useCookies();
+    const [cartS, setCart] = useState(cookies.cart);
+    
     let totalCost = 0;
     
-/*
-    useEffect(() => {
-        let col = document.querySelector("#column1");
-        let col2 = document.querySelector("#column2");
-        let col3 = document.querySelector("#column3");
-        let total = document.createElement("h1");
-        total.id = "totalCost";
-        cartS.map((elem, index)=> {
-            
-            if (index > 0 ) {
-                
-                
-                console.log(col3);
+   function lowerQuantity(item) {
     
-                let name = document.createElement("h2");
-                
-                let div = document.createElement("div");
-                div.classList.add("quantityDiv");
-                let quantity = document.createElement("h2");
-                console.log(cartS)
-                quantity.setAttribute("name", elem.name);
-
-                let left = document.createElement("img");
-                let right = document.createElement("img");
-                left.id = "left";
-                left.setAttribute("name", elem.key);
-                left.addEventListener("click", updateQuantity)
-
-                right.id = "right";
-                right.setAttribute("name", elem.key);
-                right.addEventListener("click", updateQuantity)
-
-                let x = document.createElement("img");
-                x.classList.add("removeItem");
-                x.id = elem.key;
-                x.addEventListener("click", removeItem);
-
-                div.appendChild(left);
-                div.appendChild(quantity);
-                div.appendChild(right);
-                div.appendChild(x);
-                
-
-                let price = document.createElement("h2");
-
-                name.innerText = elem.name;
-
-                quantity.innerText = elem.quantity;
-                
-
-
-                price.innerText = elem.price * elem.quantity;
-
-                //console.log(col);
-                col.appendChild(name);
-                col2.appendChild(div);
-                col3.appendChild(price);
-                totalCost = totalCost + (elem.price * elem.quantity);
-                //console.log(totalCost);
-                return elem;
-            }
-        })
-        total.innerText = "$" + totalCost;
-        col3.append(total);
-    }, []);
-    //possible fix to recreating elements
-
-    useEffect(() => {
-        if(isInitialMount.current) {
-            isInitialMount.current = false;
+        if ( item.quantity > 1) {
+            ////console.log("lowered");
+            return -1;
+            
         }
         else {
-            let total = 0;
-        cartS.map((elem, index)=> {
-            if (index > 0 ) {
-                if (elem.quantity != 0) {
-                    //console.log(elem.name)
-                    let quantity = document.getElementsByName(elem.name);
-                    //console.log(quantity[0].innerText);
-                    quantity[0].innerText = elem.quantity;
-                    return elem;
-                }
-                else {
-                    let elemElement = document.querySelec
-                }
-                
-            }
-
+            //if the current amount is too small, reveal error msg
+            let x = document.querySelector("#tooSmall");
+            x.style.visibility = "visible";
             
-        })
+           
+            return 0;
+        }
+   }
+//used for increasing the quantity of selected product
+   function increaseQuantity(item) {
+    
+    if ( item.quantity < item.max) {
+        ////console.log("lowered");
+        return 1;
+        
+    }
+    else {
+        //if the current amount is too large, reveal error msg
+        let y = document.querySelector("#tooLarge");
+        y.style.visibility = "visible";
+        return 0;
+    }
+}
 
-        let totalElem = document.querySelector("#totalCost");
-        //totalElem.innerText
-        }
-    
-  }, [cartS]);
-    
-    */
+//called when attempting to modify quantity. determines if decrease or increase function is to be called. 
+// if quantity of a product changes(countModifier), it will also update the count and cart cookies
     function updateQuantity(e) {
-        //console.log("hi")
-        let item = cartS.find(elem => elem.key == e.target.name);
-        let cart = document.querySelector(".cartCount");
+        //
+        let x = document.querySelector("#tooLarge");
+        x.style.visibility = "hidden";
+        x = document.querySelector("#tooSmall");
+        x.style.visibility = "hidden";
+        let tmpCart = cartS;
+        let item = cartS.find(elem => elem.name == e.target.name);
+        //console.log(item)
+        //let cart = document.querySelector(".cartCount");
         let quantityElement = document.getElementsByName(item.name);
-        if (e.target.id == "left" && item.quantity > 1) {
-            //console.log("lowered");
-            setCart(cartS.map((elem, index) => {
-                if (index == 0) {
-                    elem = elem - 1;
-                    return elem;
-                }
-                if (elem.key == item.key) {
-                    //console.log(elem);
-                    elem.quantity = elem.quantity - 1;
+        let countModifier = 0;
+        //console.log(quantityElement)
+        if (e.target.id == "left") {
+             countModifier = lowerQuantity(item);
+            
+        }
+        else if (e.target.id == "right"){                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+            countModifier = increaseQuantity(item);
+        }
+        if (countModifier != 0) {
+        //console.log(cookies.cartCount)
+        setCookie('cartCount', cookies.cartCount + parseInt(countModifier) , {
+            path:"/",
+            maxAge: 60*60*24,
+            secure: true,
+            sameSite: "lax",
+            });
+            tmpCart = cartS.map((elem, index) => {
+            
+                if (elem.name == item.name) {
+                    ////console.log(elem);
+                    elem.quantity = parseInt(elem.quantity) + parseInt(countModifier);
                     
                 }
-                cart.innerText = cartS[0] - 1;
+                //cart.innerText = cartS[0] - 1;
                 return elem;
-            }))
-        }
-        else if (e.target.id == "right" && item.quantity < item.max){
-            setCart(cartS.map((elem, index) => {
-                if (index == 0) {
-                    elem = elem + 1;
-                    return elem;
-                }
-                if (elem.key == item.key) {
-                    //console.log(elem);
-                    elem.quantity = parseInt(elem.quantity) + 1;
-                    
-                }
-                cart.innerText = cartS[0] + 1;
-                return elem;
-            }))
-        }
+            })
+        setCookie('cart', tmpCart, {
+            path:"/",
+            maxAge: 60*60*24,
+            secure: true,
+            sameSite: "lax",
+            });
+
+            setCart(tmpCart);
         
         
-        console.log(cartS);
+        //console.log(cartS);
+        }
+        
         
         
     }
-    
+    // removes item if the user chooses
     function removeItem(e) {
-        let itemIndex = cartS.findIndex((elem) => elem.key == e.target.name);
-        let tmpArray = cartS.map((elem) => {
+        let x = document.querySelector("#tooLarge");
+        x.style.visibility = "hidden";
+        x = document.querySelector("#tooSmall");
+        x.style.visibility = "hidden";
+        let itemIndex = cartS.findIndex((elem) => elem.name == e.target.name);
+        let tmpCart = cartS.map((elem) => {
             return elem;
         })
-        tmpArray[0] = tmpArray[0] - tmpArray[itemIndex].quantity;
-        tmpArray.splice(itemIndex,1);
+        tmpCart.splice(itemIndex,1);
+        setCookie('cartCount', cookies.cartCount - parseInt(cookies.cart[itemIndex].quantity) , {
+            path:"/",
+            maxAge: 60*60*24,
+            secure: true,
+            sameSite: "lax",
+            });
+        setCookie('cart', tmpCart, {
+            path:"/",
+            maxAge: 60*60*24,
+            secure: true,
+            sameSite: "lax",
+            });
+        setCart(tmpCart);
         
-        setCart(tmpArray);
-        let cart = document.querySelector(".cartCount");
-        cart.innerText = tmpArray[0];
-        /*setCart(cartS.map((elem, index) => {
-            
-            if (index > 0) {
-                if( elem.key == e.target.name) {
-                    console.log(elem.key + " has been removed");
-                    cartS.splice(index,1);
-                    
-                    
-                }
-                else {
-                    return elem;
-                }
-                
-  
-            }
-            
-            
-        }))*/
     }
 
 
 return (
+    <div id="page">
     <div className="main">
     <div id="column1">
         <h1>Name</h1>
         {
-            cartS.map((elem, index)=> {
-                console.log(cartS);
-                if (index > 0 && elem != null) {
+            cartS ? cartS.map((elem, index)=> {
+                //console.log(cartS);
+                
                     return (
-                        <h2>{elem.name}</h2>
+                        <h2 key={elem.key}>{elem.name}</h2>
                     )
-                }
-            })
+                
+            }):console.log("Empty Cart")
         }
     </div>
     <div id="column2">
         <h1>Quantity</h1>
         {
             
-            cartS.map((elem, index)=> {
-                if (index > 0) {
+            cartS ? cartS.map((elem, index)=> {
+                
                     return (
-                        <div id="quantityModifiers">
-                            <img  id="left" name={elem.key} onClick = {updateQuantity}/>
+                        <div key={elem.key} id="quantityModifiers">
+                            <img  id="left" name={elem.name} onClick = {updateQuantity}/>
                             <h2>{elem.quantity}</h2>
-                            <img  id="right" name={elem.key} onClick = {updateQuantity}/>
-                            <img  name={elem.key} id = "xImg" onClick={removeItem}/>
+                            <img  id="right" name={elem.name} onClick = {updateQuantity}/>
+                            <img  name={elem.name} id = "xImg" onClick={removeItem}/>
                         </div>
                     )
-                }
-            })
+                
+            }): null
         }
     </div>
     <div id="column3">
         <h1>Price</h1>
         {
-            cartS.map((elem, index)=> {
-                if (index > 0) {
+            cartS ? cartS.map((elem, index)=> {
+                
                     totalCost = totalCost + (elem.quantity * elem.price);
                     return (
-                        <h2>{elem.price}</h2>
+                        <h2 key={elem.key}>{elem.price}</h2>
                     )
-                }
+                
                    
-            })
+            }) : null
         }
         <h1 id="totalElem">${totalCost}</h1>
         <button>Proceed to Payment</button>
     </div>
+   
+    </div>
+    <h3 id="tooLarge">Not that many available</h3>
+    <h3 id="tooSmall">Use the X icon to remove from cart</h3>
     </div>
     
 )
